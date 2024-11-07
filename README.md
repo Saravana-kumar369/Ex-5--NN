@@ -1,5 +1,5 @@
-H3>ENTER YOUR NAME</H3>
-<H3>ENTER YOUR REGISTER NO.</H3>
+<H3>NAME: SARAVANA KUMAR M</H3>
+<H3>REGISTER NO.: 212222230133</H3>
 <H3>EX. NO.5</H3>
 <H3>DATE:</H3>
 <H1 ALIGN =CENTER>Implementation of XOR  using RBF</H1>
@@ -34,12 +34,75 @@ Step 6: Test the network for accuracy<br>
 Step 7: Plot the Input space and Hidden space of RBF NN for XOR classification.
 
 <H3>PROGRAM:</H3>
+<PRE>import numpy as np
+import matplotlib.pyplot as plt
 
-Insert  your code here
+def gaussian_rbf(x, landmark, gamma=1):
+    return np.exp(-gamma * np.linalg.norm(x - landmark)**2)
+
+def end_to_end(X1, X2, ys, mu1, mu2):
+    from_1 = [gaussian_rbf(i, mu1) for i in zip(X1, X2)]
+    from_2 = [gaussian_rbf(i, mu2) for i in zip(X1, X2)]
+    
+    plt.figure(figsize=(13, 5))
+    plt.subplot(1, 2, 1)
+    plt.scatter((X1[0], X1[3]), (X2[0], X2[3]), label="Class_0")
+    plt.scatter((X1[1], X1[2]), (X2[1], X2[2]), label="Class_1")
+    plt.xlabel("$X1$", fontsize=15)
+    plt.ylabel("$X2$", fontsize=15)
+    plt.title("XOR: Linearly Inseparable", fontsize=15)
+    plt.legend()
+    
+    plt.subplot(1, 2, 2)
+    plt.scatter(from_1[0], from_2[0], label="Class_0")
+    plt.scatter(from_1[1], from_2[1], label="Class_1")
+    plt.scatter(from_1[2], from_2[2], label="Class_1")
+    plt.scatter(from_1[3], from_2[3], label="Class_0")
+    plt.plot([0, 0.95], [0.95, 0], "k--")
+    plt.annotate("Separating hyperplane", xy=(0.4, 0.55), xytext=(0.55, 0.66),
+                 arrowprops=dict(facecolor='black', shrink=0.05))
+    plt.xlabel(f"$mu_1$: {mu1}", fontsize=15)
+    plt.ylabel(f"$mu_2$: {mu2}", fontsize=15)
+    plt.title("Transformed Inputs: Linearly Separable", fontsize=15)
+    plt.legend()
+    
+    A = []
+    for i, j in zip(from_1, from_2):
+        temp = [i, j, 1]  
+        A.append(temp)
+    A = np.array(A)
+    
+    W = np.linalg.inv(A.T.dot(A)).dot(A.T).dot(ys)
+    print("Predicted outputs (rounded):", np.round(A.dot(W)))
+    print("Actual outputs:", ys)
+    print(f"Weights: {W}")
+    return W
+
+def predict_matrix(point, weights, mu1, mu2):
+    gaussian_rbf_0 = gaussian_rbf(np.array(point), mu1)
+    gaussian_rbf_1 = gaussian_rbf(np.array(point), mu2)
+    A = np.array([gaussian_rbf_0, gaussian_rbf_1, 1])
+    return np.round(A.dot(weights))
+
+X1 = np.array([0, 0, 1, 1])
+X2 = np.array([0, 1, 0, 1])
+ys = np.array([0, 1, 1, 0])
+
+mu1 = np.array([0, 1])
+mu2 = np.array([1, 0])
+
+y_pred = end_to_end(X1, X2, ys, mu1, mu2)
+
+print(f"Input: [0, 0], Predicted: {predict_matrix([0, 0], y_pred, mu1, mu2)}")
+print(f"Input: [0, 1], Predicted: {predict_matrix([0, 1], y_pred, mu1, mu2)}")
+print(f"Input: [1, 0], Predicted: {predict_matrix([1, 0], y_pred, mu1, mu2)}")
+print(f"Input: [1, 1], Predicted: {predict_matrix([1, 1], y_pred, mu1, mu2)}")
+</PRE>
 
 <H3>OUTPUT:</H3>
 
-Show your code here
+![image](https://github.com/user-attachments/assets/19fcb39c-010f-4d24-82d7-0b85998ad01b)
+
 
 <H3>Result:</H3>
 Thus , a Radial Basis Function Neural Network is implemented to classify XOR data.
